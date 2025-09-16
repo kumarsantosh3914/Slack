@@ -5,6 +5,7 @@ import v2Router from './routers/v2/index.router.js';
 import { appErrorHandler, genericErrorHandler } from './middlewares/error.middleware.js';
 import { attachCorrelationIdMiddleware } from './middlewares/correlation.middleware.js';
 import logger from './config/logger.config.js';
+import connectDB from './config/db.config.js';
 
 const app = express();
 
@@ -19,6 +20,8 @@ app.use(genericErrorHandler);
 
 app.listen(serverConfig.PORT, async () => {
     logger.info(`Server is running on http://localhost:${serverConfig.PORT}`);
+
+    await connectDB();
 });
 
 
