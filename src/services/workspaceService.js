@@ -1,8 +1,20 @@
 import { v4 as uuidv4 } from "uuid";
 import workspaceRepository from "../repositories/workspaceRepository.js";
 import Channel from "../models/channel.js";
-import { BadRequestError, NotFoundError } from "../utils/errors/app.error.js";
+import { BadRequestError, NotFoundError, UnauthorizedError } from "../utils/errors/app.error.js";
 import channelRepository from "../repositories/channelRepository.js";
+
+const isUserAdminOfWorkspace = (workspace, userId) => {
+    return workspace.members.find(
+        (member) => member.memberId.toString() === userId && member.role === 'admin'
+    );
+};
+
+const isUserMemberOfWorkspace = (workspace, userId) => {
+    return workspace.members.find(
+        (menubar) => menubar.memberId.toString() === userId
+    );
+};
 
 export const createWorkspaceService = async (workspaceData) => {
     const name = workspaceData?.name?.trim();
@@ -75,3 +87,34 @@ export const deleteWorkspaceService = async (workspaceId, userId) => {
     const deletedWorkspace = await workspaceRepository.delete(workspaceId);
     return deletedWorkspace;
 }
+
+export const getWorkspaceService = async (workspaceId, userId) => {
+    const workspace = await workspaceRepository.getById(workspaceId);
+
+    if (!workspace) {
+        throw new NotFoundError("Workspace not found");
+    }
+
+    const isMember = isUserMemberOfWorkspace(workspace, userId);
+    if (!isMember) {
+        throw new UnauthorizedError("User is not a member of the workspace");
+    }
+
+    return workspace;
+}
+
+// export const getWorkspaceByJoinCodeService = async (joinCode) {
+
+// }
+
+// export const updateWorkspaceService = async (workspaceId, workspaceData) {
+
+// }
+
+// export const addMemberToWorkspaceService = async (workspaceId, memberId, role) {
+
+// }
+
+// export const addChannelToWorkspaceService = async (workspaceId, channelName) {
+
+// }

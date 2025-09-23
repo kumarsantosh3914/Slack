@@ -1,5 +1,5 @@
 import { StatusCodes } from "http-status-codes";
-import { createWorkspaceService, deleteWorkspaceService, getWorkspacesUserIsMemberOfService } from "../services/workspaceService.js";
+import { createWorkspaceService, deleteWorkspaceService, getWorkspaceService, getWorkspacesUserIsMemberOfService } from "../services/workspaceService.js";
 import { BadRequestError } from "../utils/errors/app.error.js";
 
 export const createWorkspaceController = async (req, res, next) => {
@@ -51,6 +51,23 @@ export const deleteWorkspaceController = async (req, res, next) => {
 
         res.status(StatusCodes.OK).json({
             message: 'Workspace deleted successfully',
+            data: response,
+            success: true,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export const getWorkspaceController = async (req, res) => {
+    try {
+        const response = await getWorkspaceService(
+            req.params.workspaceId,
+            req.user
+        );
+        
+        res.status(StatusCodes.OK).json({
+            message: 'Workspace fetch successfully',
             data: response,
             success: true,
         });
