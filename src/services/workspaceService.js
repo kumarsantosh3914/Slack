@@ -1,8 +1,9 @@
 import { v4 as uuidv4 } from "uuid";
 import workspaceRepository from "../repositories/workspaceRepository.js";
 import Channel from "../models/channel.js";
-import { BadRequestError, NotFoundError, UnauthorizedError } from "../utils/errors/app.error.js";
+import { BadRequestError, ForbiddenError, NotFoundError, UnauthorizedError } from "../utils/errors/app.error.js";
 import channelRepository from "../repositories/channelRepository.js";
+import userRepository from "../repositories/userRepository.js";
 
 const isUserAdminOfWorkspace = (workspace, userId) => {
     return workspace.members.find(
@@ -103,18 +104,81 @@ export const getWorkspaceService = async (workspaceId, userId) => {
     return workspace;
 }
 
-// export const getWorkspaceByJoinCodeService = async (joinCode) {
+export const getWorkspaceByJoinCodeService = async (joinCode) => {
+    const workspace = await workspaceRepository.getWorkspaceByJoinCode(joinCode);
+    if (!workspace) {
+        throw new NotFoundError("Workspace not found");
+    }
 
-// }
+    const isMember = isUserMemberOfWorkspace(workspace, userId);
+    if (!isMember) {
+        throw new UnauthorizedError("User is not a member of the workspace");
+    }
 
-// export const updateWorkspaceService = async (workspaceId, workspaceData) {
+    return workspace;
+}
 
-// }
+export const updateWorkspaceService = async (workspaceId, workspaceData, userId) => {
+    const workspace = await workspaceRepository.getById(workspaceId);
+    if (!workspace) {
+        throw new NotFoundError("Workspace not found");
+    }
 
-// export const addMemberToWorkspaceService = async (workspaceId, memberId, role) {
+    const isAdmin = isUserAdminOfWorkspace(workspace, userId);
+    if (!isAdmin) {
+        throw new UnauthorizedError("User is not an admin of the workspace")
+    };
 
-// }
+    const updatedWorkspace = await workspaceRepository.update(
+        workspaceId,
+        workspaceData
+    );
 
-// export const addChannelToWorkspaceService = async (workspaceId, channelName) {
+    return updatedWorkspace;
+}
 
-// }
+export const addMemberToWorkspaceService = async (workspaceId, memberId, role) => {
+    const workspace = await workspaceRepository.getById(workspaceId);
+    if (!workspace) {
+        throw new NotFoundError("Workspace not found");
+    }
+
+    const isValidUser = await userRepository.getById(memberId);
+    if (!isValidUser) {
+        throw new NotFoundError("User not found");
+    }
+
+    const isMember = isUserMemberOfWorkspace(workspace, memberId);
+    if (!isMember) {
+        throw new UnauthorizedError("User is not a member of the workspace");
+    }
+
+    const response = await workspaceRepository.addMemberToWorkspace(
+        workspaceId,
+        memberId,
+        role
+    );
+
+    return response;
+}
+
+export const addChannelToWorkspaceService = async (workspaceId, channelName, userId) => {
+    const workspace = await workspaceRepository.getWorkspaceDetailsById(workspaceId);
+    if (!workspace) {
+        throw new NotFoundError("Workspace not found");
+    }
+
+    const isAdmin = isUserAdminOfWorkspace(workspace, userId);
+    if (!isAdmin) {
+        throw new UnauthorizedError("User is not an admin of the workspace");
+    }
+
+    const isChannelPartOfWorkspace = isChannelPartOfWorkspace(workspace, channelName);
+    if(isChannelPartOfWorkspace) {
+        throw new ForbiddenError("Channel already part of workspace");
+    }
+
+    const response = await workspaceRepository.addChannelToWorkspace(workspaceId, channelName);
+
+    return response;
+}

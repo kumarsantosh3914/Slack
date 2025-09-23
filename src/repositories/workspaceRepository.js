@@ -70,6 +70,14 @@ const workspaceRepository = {
             .exec();
         return workspaces;
     }, 
+
+    getWorkspaceDetailsById: async function (workspaceId) {
+        const workspace = await Workspace.findById(workspaceId)
+           .populate('members.memberId', 'User email avatar')
+           .populate('channels');
+
+        return workspace;
+    }
 };
 
 export default workspaceRepository;
