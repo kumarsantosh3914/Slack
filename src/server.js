@@ -6,6 +6,7 @@ import { appErrorHandler, genericErrorHandler } from './middlewares/error.middle
 import { attachCorrelationIdMiddleware } from './middlewares/correlation.middleware.js';
 import logger from './config/logger.config.js';
 import connectDB from './config/db.config.js';
+import mailer from './config/mailConfig.js';
 
 const app = express();
 
@@ -22,6 +23,14 @@ app.listen(serverConfig.PORT, async () => {
     logger.info(`Server is running on http://localhost:${serverConfig.PORT}`);
 
     await connectDB();
+    // const mailResponse = await mailer.sendMail({
+    //     from: 'santoshchhinchholikar@gmail.com',
+    //     to: 'santoshkumar15novmth@gmail.com',
+    //     subject: 'Welcome mail from slack!',
+    //     text: 'Welcome from the slack server...'
+    // });
+
+    // console.log(mailResponse);
 });
 
 
