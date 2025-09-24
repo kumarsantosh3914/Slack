@@ -21,6 +21,11 @@ const channelRepository = {
         
         const channel = await Channel.create({ name, workspaceId, isPrivate, topic });
         return channel;
+    },
+
+    getChannelWithWorkspaceDetails: async function getChannelWithWorkspaceDetails(channelId) {
+        const channel = await Channel.findById(channelId).populate('workspaceId');
+        return channel;
     }
 };
 

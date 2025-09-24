@@ -19,7 +19,7 @@ const isUserAdminOfWorkspace = (workspace, userId) => {
   );
 };
 
-const isUserMemberOfWorkspace = (workspace, userId) => {
+export const isUserMemberOfWorkspace = (workspace, userId) => {
   return workspace.members.find(
     (menubar) => menubar.memberId.toString() === userId
   );
