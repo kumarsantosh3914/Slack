@@ -16,7 +16,9 @@ export const serverConfig = {
     JWT_SECRET: String(process.env.JWT_SECRET),
     JWT_EXPIRY: String(process.env.JWT_EXPIRY),
     MAIL_ID: String(process.env.MAIL_ID),
-    MAIL_PASSWORD: String(process.env.MAIL_PASSWORD)
+    MAIL_PASSWORD: String(process.env.MAIL_PASSWORD),
+    REDIS_HOST: String(process.env.REDIS_HOST),
+    REDIS_PORT: Number(process.env.REDIS_PORT),
 };
 
 

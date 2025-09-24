@@ -9,6 +9,8 @@ import {
 } from "../utils/errors/app.error.js";
 import channelRepository from "../repositories/channelRepository.js";
 import userRepository from "../repositories/userRepository.js";
+import { addEmailToMailQueue } from "../producers/mailQueueProducer.js";
+import { workspaceJoinMail } from "../utils/common/mailObject.js";
 
 const isUserAdminOfWorkspace = (workspace, userId) => {
   return workspace.members.find(
@@ -298,6 +300,11 @@ export const addMemberToWorkspaceService = async (
       memberId,
       role,
     );
+
+    addEmailToMailQueue({
+      ...workspaceJoinMail(workspace),
+      to: userToAdd.email
+    });
 
     // Add user to all public channels in the workspace
     if (workspace.channels && workspace.channels.length > 0) {
