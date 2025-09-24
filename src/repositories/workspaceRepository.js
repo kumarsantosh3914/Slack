@@ -32,18 +32,22 @@ const workspaceRepository = {
         return workspace;
     },
 
-    // Note: despite name, this currently adds a member to workspace
-    addChannelToWorkspace: async function addChannelToWorkspace(workspaceId, memberId, role = 'member') {
+    addMemberToWorkspace: async function addMemberToWorkspace(workspaceId, memberId, role = 'member', options = {}) {
         if (!workspaceId || !memberId) throw new BadRequestError('workspaceId and memberId are required');
         if (!['admin', 'member'].includes(role)) throw new BadRequestError('Invalid role');
 
-        const user = await User.findById(memberId).select('_id').lean().exec();
+        const user = await User.findById(memberId)
+            .select('_id')
+            .lean()
+            .session(options.session)
+            .exec();
+            
         if (!user) throw new NotFoundError('User not found');
 
         const updated = await Workspace.findOneAndUpdate(
             { _id: workspaceId, 'members.memberId': { $ne: memberId } },
             { $addToSet: { members: { memberId, role } } },
-            { new: true }
+            { new: true, session: options.session }
         ).lean().exec();
 
         if (!updated) {

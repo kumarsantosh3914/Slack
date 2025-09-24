@@ -29,7 +29,10 @@ export const signUpService = async (data) => {
     logger.info('User signed up', { email: created.email, id: created._id });
 
     const token = createJWT({ id: created._id, email: created.email, username: created.username });
-    return user;
+    return {
+        user: created,
+        token
+    };
 }
 
 export const verifyTokenService = async (token) => {

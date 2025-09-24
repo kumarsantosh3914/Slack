@@ -56,7 +56,7 @@ export const deleteWorkspaceController = async (req, res, next) => {
       throw new BadRequestError("Workspace ID is required");
     }
 
-    const response = await deleteWorkspaceService(workspaceId, userId);
+    const response = await deleteWorkspaceService(workspaceId, userId, next);
 
     res.status(StatusCodes.OK).json({
       message: "Workspace deleted successfully",
@@ -68,28 +68,29 @@ export const deleteWorkspaceController = async (req, res, next) => {
   }
 };
 
-export const getWorkspaceController = async (req, res) => {
+export const getWorkspaceController = async (req, res, next) => {
   try {
     const response = await getWorkspaceService(
       req.params.workspaceId,
-      req.user
+      req.user?._id || req.user
     );
 
     res.status(StatusCodes.OK).json({
-      message: "Workspace fetch successfully",
+      message: "Workspace fetched successfully",
       data: response,
       success: true,
     });
   } catch (error) {
+    // Pass error to error handling middleware
     next(error);
   }
 };
 
-export const getWorkspaceByJoinCodeController = async (req, res) => {
+export const getWorkspaceByJoinCodeController = async (req, res, next) => {
   try {
     const response = await getWorkspaceByJoinCodeService(
       req.params.joinCode,
-      req.user
+      req.user?._id || req.user
     );
 
     res.status(StatusCodes.OK).json({
@@ -102,7 +103,7 @@ export const getWorkspaceByJoinCodeController = async (req, res) => {
   }
 };
 
-export const updatedWorkspaceController = async (req, res) => {
+export const updatedWorkspaceController = async (req, res, next) => {
   try {
     const response = await updatedWorkspaceService(
       req.params.workspaceId,
@@ -120,7 +121,7 @@ export const updatedWorkspaceController = async (req, res) => {
   }
 };
 
-export const addMemberToWorkspaceController = async (req, res) => {
+export const addMemberToWorkspaceController = async (req, res, next) => {
   try {
     const response = await addMemberToWorkspaceService(
       req.params.workspaceId,
@@ -139,7 +140,7 @@ export const addMemberToWorkspaceController = async (req, res) => {
   }
 };
 
-export const addChannelToWorkspaceController = async (req, res) => {
+export const addChannelToWorkspaceController = async (req, res, next) => {
   try {
     const response = await addChannelToWorkspaceService(
       req.params.workspaceId,
