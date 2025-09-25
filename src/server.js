@@ -7,12 +7,14 @@ import { attachCorrelationIdMiddleware } from './middlewares/correlation.middlew
 import logger from './config/logger.config.js';
 import connectDB from './config/db.config.js';
 import mailer from './config/mailConfig.js';
+import bullServerAdapter from './config/bullBoardConfig.js';
 
 const app = express();
 
 app.use(express.json());
 
 app.use(attachCorrelationIdMiddleware);
+app.use('/ui', bullServerAdapter.getRouter());
 app.use('/api/v1', v1Router);
 app.use('/api/v2', v2Router);
 

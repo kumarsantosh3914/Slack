@@ -12,6 +12,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@bull-board/express": "^6.13.0",
     "bcrypt": "^6.0.0",
     "bull": "^4.16.5",
     "dotenv": "^16.5.0",
